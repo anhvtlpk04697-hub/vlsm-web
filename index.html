@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galaxy Soft-Pink VLSM Master</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #0a060e;
+            --card-bg: rgba(22, 14, 28, 0.65);
+            --card-border: rgba(255, 182, 193, 0.25);
+            --pink-soft: #ffb6c1;
+            --pink-rose: #ff80ab;
+            --pink-glow: rgba(255, 128, 171, 0.3);
+            --purple-mist: #b388ff;
+            --cyan-mist: #80d8ff;
+            --text-main: #fcf0f5;
+            --text-muted: #d1b3c4;
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 30px 15px;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Canvas Vũ Trụ Phía Nền */
+        #galaxyCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header Soft Pink Galaxy */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.8rem;
+            margin: 0 0 8px 0;
+            background: linear-gradient(135deg, #ffffff, var(--pink-soft), var(--pink-rose), var(--purple-mist));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 25px var(--pink-glow);
+            letter-spacing: -0.5px;
+            font-weight: 800;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        /* Card Glassmorphism mờ nhẹ */
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 26px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(255, 182, 193, 0.05);
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            color: var(--pink-soft);
+            margin-top: 0;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 12px;
+        }
+
+        .card-title i {
+            margin-right: 8px;
+            color: var(--pink-rose);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(10, 6, 14, 0.7);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        input[type="text"]:focus, input[type="number"]:focus {
+            border-color: var(--pink-rose);
+            box-shadow: 0 0 15px var(--pink-glow);
+        }
+
+        .subnet-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        /* Dashboard Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255, 182, 193, 0.05);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .stat-card .value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--pink-soft);
+            margin-top: 5px;
+        }
+
+        .stat-card .label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        /* Buttons Hồng Nhẹ */
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .btn-pink {
+            background: linear-gradient(135deg, var(--pink-rose), var(--purple-mist));
+            color: #fff;
+            box-shadow: 0 0 20px var(--pink-glow);
+            flex: 2;
+        }
+
+        .btn-pink:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 28px rgba(255, 128, 171, 0.6);
+        }
+
+        .btn-outline {
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-main);
+            border: 1px solid var(--card-border);
+            flex: 1;
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 182, 193, 0.12);
+            border-color: var(--pink-soft);
+        }
+
+        .btn-remove {
+            background: rgba(255, 100, 100, 0.15);
+            color: #ff9999;
+            border: 1px solid rgba(255, 100, 100, 0.25);
+            padding: 0 15px;
+            border-radius: 10px;
+        }
+
+        .btn-remove:hover {
+            background: rgba(255, 100, 100, 0.3);
+        }
+
+        /* Visual Bar Vũ Trụ */
+        .visual-bar-container {
+            height: 28px;
+            width: 100%;
+            background: rgba(0,0,0,0.5);
+            border-radius: 14px;
+            overflow: hidden;
+            display: flex;
+            margin: 20px 0;
+            border: 1px solid var(--card-border);
+            padding: 2px;
+        }
+
+        .visual-segment {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: #fff;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            padding: 0 6px;
+            border-radius: 10px;
+        }
+
+        /* Table Style */
+        .table-tools {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            max-width: 300px;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background: rgba(255, 182, 193, 0.08);
+            padding: 14px 16px;
+            color: var(--pink-soft);
+            border-bottom: 2px solid var(--card-border);
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        tr:hover td {
+            background: rgba(255, 182, 193, 0.04);
+        }
+
+        /* Code Box */
+        .code-box {
+            position: relative;
+        }
+
+        pre {
+            background: rgba(5, 3, 8, 0.85);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 18px;
+            color: #a7f3d0;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            margin: 0;
+        }
+
+        .btn-copy {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            padding: 6px 14px;
+            font-size: 0.75rem;
+            background: rgba(255, 182, 193, 0.15);
+            border: 1px solid var(--pink-soft);
+            color: #fff;
+            border-radius: 8px;
+        }
+
+        .btn-copy:hover {
+            background: var(--pink-rose);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        footer strong {
+            color: var(--pink-soft);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media print {
+            #galaxyCanvas { display: none; }
+            body { background: #fff; color: #000; }
+            .card { background: #fff; border: 1px solid #ccc; box-shadow: none; color: #000; }
+            .btn-group, .btn-copy, .btn-remove, header p, .form-group { display: none !important; }
+            th { background: #f0f0f0; color: #000; }
+            pre { background: #f8f8f8; color: #000; border: 1px solid #ccc; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Background Vũ Trụ Canvas -->
+<canvas id="galaxyCanvas"></canvas>
+
+<div class="container">
+    <header>
+        <h1><i class="fa-solid fa-star"></i> Chuyển Đổi IP & Chia Mạng VLSM</h1>
+        <p>Hệ thống hoạch định Subnet Soft-Pink Pastel & Vũ trụ hiệu ứng</p>
+    </header>
+
+    <div class="card">
+        <div class="card-title">
+            <span><i class="fa-solid fa-sliders"></i> Thiết lập thông số mạng ban đầu</span>
+        </div>
+
+        <div class="form-group">
+            <label for="networkIp">Địa chỉ IP ban đầu & Prefix CIDR</label>
+            <input type="text" id="networkIp" value="192.168.1.0/24" placeholder="VD: 10.0.0.0/16 hoặc 192.168.1.0/24">
+        </div>
+
+        <label>Danh sách Subnets & Số lượng Host yêu cầu</label>
+        <div id="subnetsContainer">
+            <div class="subnet-row">
+                <input type="text" placeholder="Tên Mạng" class="sub-name" value="Phòng Server Tier 1">
+                <input type="number" placeholder="Số Host" class="sub-hosts" value="50">
+                <button type="button" class="btn-remove" onclick="removeSubnetInput(this)"><i class="fa-solid fa-trash"></i></button>
+            </div>
+            <div class="subnet-row">
+                <input type="text" placeholder="Tên Mạng" class="sub-name" value="Khối Thiết Kế UI/UX">
+                <input type="number" placeholder="Số Host" class="sub-hosts" value="25">
+                <button type="button" class="btn-remove" onclick="removeSubnetInput(this)"><i class="fa-solid fa-trash"></i></button>
+            </div>
+            <div class="subnet-row">
+                <input type="text" placeholder="Tên Mạng" class="sub-name" value="Phòng Hành Chính">
+                <input type="number" placeholder="Số Host" class="sub-hosts" value="10">
+                <button type="button" class="btn-remove" onclick="removeSubnetInput(this)"><i class="fa-solid fa-trash"></i></button>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button type="button" class="btn-outline" onclick="addSubnetInput()"><i class="fa-solid fa-plus"></i> Thêm Subnet</button>
+            <button type="button" class="btn-pink" onclick="calculateVLSM()"><i class="fa-solid fa-wand-magic-sparkles"></i> Tính Toán VLSM</button>
+        </div>
+    </div>
+
+    <!-- Khung Báo Cáo Kết Quả -->
+    <div class="card" id="resultCard" style="display:none;">
+        
+        <!-- Dashboard Thống Kê Nhanh -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="label">Tổng Số Subnet</div>
+                <div class="value" id="statSubnets">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Host Yêu Cầu</div>
+                <div class="value" id="statNeeded">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">IP Cấp Phát</div>
+                <div class="value" id="statAllocated">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Tỷ Lệ Sử Dụng</div>
+                <div class="value" id="statEfficiency">0%</div>
+            </div>
+        </div>
+
+        <div class="card-title">
+            <span><i class="fa-solid fa-chart-pie"></i> Sơ Đồ Không Gian IP Trực Quan</span>
+        </div>
+        <div class="visual-bar-container" id="visualBar"></div>
+
+        <div class="card-title" style="margin-top: 25px;">
+            <span><i class="fa-solid fa-list-check"></i> Chi Tiết Bảng Chia Subnet</span>
+            <div class="btn-group" style="margin:0;">
+                <button class="btn-outline" onclick="exportCSV()"><i class="fa-solid fa-file-excel"></i> Xuất CSV</button>
+                <button class="btn-outline" onclick="window.print()"><i class="fa-solid fa-print"></i> In / PDF</button>
+            </div>
+        </div>
+
+        <div class="table-tools">
+            <input type="text" id="tableSearch" class="search-box" placeholder="🔍 Tìm kiếm subnet..." onkeyup="filterTable()">
+        </div>
+
+        <div class="table-responsive">
+            <table id="resultTable">
+                <thead>
+                    <tr>
+                        <th>Tên Subnet</th>
+                        <th>Host Yêu Cầu</th>
+                        <th>Cấp Phát</th>
+                        <th>Network IP</th>
+                        <th>Subnet Mask</th>
+                        <th>Dải IP Usable</th>
+                        <th>Broadcast IP</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!-- Chế độ Giải Thích Chi Tiết -->
+        <div class="card-title" style="margin-top: 35px;">
+            <span><i class="fa-solid fa-graduation-cap"></i> Phân Tích Logic Nhị Phân & Chi Tiết Tính Toán</span>
+        </div>
+        <div id="binaryBreakdown" style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6;"></div>
+
+        <!-- Cisco CLI Generator -->
+        <div class="card-title" style="margin-top: 35px;">
+            <span><i class="fa-solid fa-terminal"></i> Cisco Router CLI Configuration</span>
+        </div>
+        <div class="code-box">
+            <button class="btn-copy" onclick="copyCLI()"><i class="fa-solid fa-copy"></i> Copy CLI</button>
+            <pre id="cliOutput"></pre>
+        </div>
+    </div>
+
+    <footer>
+        <p>Thiết kế độc quyền bởi <strong>Lâm Anh</strong> • Galaxy Soft-Pink Studio</p>
+    </footer>
+</div>
+
+<script>
+    // --- HIỆU ỨNG VŨ TRỤ GALAXY STARFIELD CANVAS ---
+    const canvas = document.getElementById('galaxyCanvas');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+    const numStars = 150;
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+
+    function initStars() {
+        stars = [];
+        for (let i = 0; i < numStars; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 1.5 + 0.5,
+                alpha: Math.random(),
+                speed: Math.random() * 0.015 + 0.005,
+                color: ['#ffb6c1', '#ff80ab', '#b388ff', '#80d8ff', '#ffffff'][Math.floor(Math.random() * 5)]
+            });
+        }
+    }
+
+    function animateGalaxy() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Tạo hiệu ứng đám mây tinh vân (Nebula Glow)
+        const gradient = ctx.createRadialGradient(
+            canvas.width * 0.3, canvas.height * 0.3, 50,
+            canvas.width * 0.3, canvas.height * 0.3, canvas.width * 0.6
+        );
+        gradient.addColorStop(0, 'rgba(255, 128, 171, 0.08)');
+        gradient.addColorStop(0.5, 'rgba(179, 136, 255, 0.05)');
+        gradient.addColorStop(1, 'transparent');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Vẽ các ngôi sao lấp lánh
+        stars.forEach(star => {
+            star.alpha += star.speed;
+            if (star.alpha > 1 || star.alpha < 0) {
+                star.speed = -star.speed;
+            }
+
+            ctx.beginPath();
+            ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+            ctx.fillStyle = star.color;
+            ctx.globalAlpha = Math.abs(star.alpha);
+            ctx.shadowBlur = star.radius * 4;
+            ctx.shadowColor = star.color;
+            ctx.fill();
+        });
+
+        ctx.globalAlpha = 1;
+        requestAnimationFrame(animateGalaxy);
+    }
+
+    window.addEventListener('resize', () => {
+        resizeCanvas();
+        initStars();
+    });
+
+    resizeCanvas();
+    initStars();
+    animateGalaxy();
+
+
+    // --- LOGIC CHIA SUBNET VLSM ---
+    const softPinkPalette = [
+        '#ffb6c1', '#ff80ab', '#b388ff', '#80d8ff', 
+        '#f48fb1', '#ce93d8', '#9fa8da', '#80deea'
+    ];
+
+    function addSubnetInput() {
+        const container = document.getElementById('subnetsContainer');
+        const div = document.createElement('div');
+        div.className = 'subnet-row';
+        div.innerHTML = `
+            <input type="text" placeholder="Tên Mạng" class="sub-name">
+            <input type="number" placeholder="Số Host" class="sub-hosts">
+            <button type="button" class="btn-remove" onclick="removeSubnetInput(this)"><i class="fa-solid fa-trash"></i></button>
+        `;
+        container.appendChild(div);
+    }
+
+    function removeSubnetInput(btn) {
+        const rows = document.querySelectorAll('.subnet-row');
+        if (rows.length > 1) {
+            btn.parentElement.remove();
+        } else {
+            alert("Phải giữ lại ít nhất 1 dòng subnet!");
+        }
+    }
+
+    function ipToInt(ip) {
+        return ip.split('.').reduce((acc, octet) => (acc << 8) + parseInt(octet, 10), 0) >>> 0;
+    }
+
+    function intToIp(int) {
+        return [(int >>> 24) & 255, (int >>> 16) & 255, (int >>> 8) & 255, int & 255].join('.');
+    }
+
+    let calculatedData = [];
+
+    function calculateVLSM() {
+        const netInput = document.getElementById('networkIp').value.trim();
+        const [baseIpStr, prefixStr] = netInput.split('/');
+        
+        if (!baseIpStr || !prefixStr || prefixStr < 0 || prefixStr > 32) {
+            alert("Vui lòng nhập đúng định dạng IP/Prefix (VD: 192.168.1.0/24 hoặc 10.0.0.0/16)");
+            return;
+        }
+
+        const basePrefix = parseInt(prefixStr, 10);
+        const totalAvailableSpace = Math.pow(2, 32 - basePrefix);
+        let currentIpInt = ipToInt(baseIpStr);
+
+        const names = document.querySelectorAll('.sub-name');
+        const hosts = document.querySelectorAll('.sub-hosts');
+        let subnets = [];
+
+        for (let i = 0; i < names.length; i++) {
+            const h = parseInt(hosts[i].value, 10);
+            if (h > 0) {
+                subnets.push({
+                    name: names[i].value || `Subnet ${i + 1}`,
+                    neededHosts: h
+                });
+            }
+        }
+
+        if (subnets.length === 0) {
+            alert("Vui lòng nhập ít nhất 1 subnet có số host > 0!");
+            return;
+        }
+
+        subnets.sort((a, b) => b.neededHosts - a.neededHosts);
+
+        const tbody = document.querySelector('#resultTable tbody');
+        const visualBar = document.getElementById('visualBar');
+        const binaryDiv = document.getElementById('binaryBreakdown');
+        
+        tbody.innerHTML = '';
+        visualBar.innerHTML = '';
+        binaryDiv.innerHTML = '';
+        calculatedData = [];
+
+        let cliText = "! ==========================================\n";
+        cliText += `! GALAXY SOFT-PINK VLSM CONFIG - ${netInput}\n`;
+        cliText += "! ==========================================\n\n";
+
+        let totalNeededHosts = 0;
+        let totalAllocatedHosts = 0;
+        let usedSpace = 0;
+
+        subnets.forEach((sub, index) => {
+            const totalNeeded = sub.neededHosts + 2;
+            let hostBits = Math.ceil(Math.log2(totalNeeded));
+            if (hostBits < 2) hostBits = 2;
+
+            const prefix = 32 - hostBits;
+            const allocatedHosts = Math.pow(2, hostBits) - 2;
+            const blockSize = Math.pow(2, hostBits);
+
+            usedSpace += blockSize;
+            totalNeededHosts += sub.neededHosts;
+            totalAllocatedHosts += allocatedHosts;
+
+            const netMaskInt = ((0xFFFFFFFF << hostBits) >>> 0);
+            const netMaskStr = intToIp(netMaskInt);
+
+            const networkIpStr = intToIp(currentIpInt);
+            const firstUsable = intToIp(currentIpInt + 1);
+            const lastUsable = intToIp(currentIpInt + blockSize - 2);
+            const broadcastIpStr = intToIp(currentIpInt + blockSize - 1);
+
+            calculatedData.push({
+                name: sub.name,
+                needed: sub.neededHosts,
+                allocated: `${allocatedHosts} (/${prefix})`,
+                network: networkIpStr,
+                mask: netMaskStr,
+                usable: `${firstUsable} - ${lastUsable}`,
+                broadcast: broadcastIpStr
+            });
+
+            tbody.innerHTML += `<tr>
+                <td><strong>${sub.name}</strong></td>
+                <td>${sub.neededHosts}</td>
+                <td><span style="color:var(--pink-soft); font-weight:bold;">${allocatedHosts}</span> (/${prefix})</td>
+                <td><code style="color:var(--cyan-mist); font-weight:bold;">${networkIpStr}</code></td>
+                <td>${netMaskStr}</td>
+                <td>${firstUsable} - ${lastUsable}</td>
+                <td>${broadcastIpStr}</td>
+            </tr>`;
+
+            const percentage = (blockSize / totalAvailableSpace) * 100;
+            const color = softPinkPalette[index % softPinkPalette.length];
+            visualBar.innerHTML += `<div class="visual-segment" style="width: ${percentage}%; background: ${color};" title="${sub.name}: /${prefix} (${percentage.toFixed(1)}%)">
+                ${percentage > 6 ? sub.name + ' (/' + prefix + ')' : ''}
+            </div>`;
+
+            binaryDiv.innerHTML += `<p>✨ <strong>${sub.name}</strong>: Cần ${sub.neededHosts} host &rarr; Khối $2^{${hostBits}} = ${blockSize}$ IP &rarr; Prefix: <strong>/${prefix}</strong> (${netMaskStr}). Network IP: <code>${networkIpStr}</code></p>`;
+
+            cliText += `interface GigabitEthernet0/${index}\n`;
+            cliText += ` description -- LAN: ${sub.name} --\n`;
+            cliText += ` ip address ${firstUsable} ${netMaskStr}\n`;
+            cliText += ` no shutdown\n!\n`;
+
+            currentIpInt += blockSize;
+        });
+
+        document.getElementById('statSubnets').textContent = subnets.length;
+        document.getElementById('statNeeded').textContent = totalNeededHosts;
+        document.getElementById('statAllocated').textContent = totalAllocatedHosts;
+        const efficiency = ((usedSpace / totalAvailableSpace) * 100).toFixed(1);
+        document.getElementById('statEfficiency').textContent = `${efficiency}%`;
+
+        if (usedSpace < totalAvailableSpace) {
+            const remaining = totalAvailableSpace - usedSpace;
+            const percentage = (remaining / totalAvailableSpace) * 100;
+            visualBar.innerHTML += `<div class="visual-segment" style="width: ${percentage}%; background: rgba(255,255,255,0.06); color: var(--text-muted);" title="Trống">
+                ${percentage > 6 ? 'Trống' : ''}
+            </div>`;
+        }
+
+        document.getElementById('cliOutput').textContent = cliText;
+        document.getElementById('resultCard').style.display = 'block';
+    }
+
+    function filterTable() {
+        const query = document.getElementById('tableSearch').value.toLowerCase();
+        const rows = document.querySelectorAll('#resultTable tbody tr');
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(query) ? '' : 'none';
+        });
+    }
+
+    function exportCSV() {
+        if (calculatedData.length === 0) return;
+        let csv = "Ten Subnet,Host Yeu Cau,Host Cap Phat,Network Address,Subnet Mask,Dai IP Usable,Broadcast Address\n";
+        calculatedData.forEach(row => {
+            csv += `"${row.name}","${row.needed}","${row.allocated}","${row.network}","${row.mask}","${row.usable}","${row.broadcast}"\n`;
+        });
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.setAttribute("download", "Galaxy_VLSM_Report.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function copyCLI() {
+        const cliText = document.getElementById('cliOutput').textContent;
+        navigator.clipboard.writeText(cliText).then(() => {
+            alert("Đã sao chép lệnh Cisco CLI vào Clipboard!");
+        });
+    }
+</script>
+
+</body>
+</html>
